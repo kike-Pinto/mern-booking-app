@@ -36,8 +36,8 @@ test('should allow user to add a hotel', async ({ page }) => {
   await page.getByLabel('Free Wifi').check()
   await page.getByLabel('Parking').check()
 
-  await page.locator('["name=adultCount"]').fill('2')
-  await page.locator('["name=childCount"]').fill('4')
+  await page.locator('[name="adultCount"]').fill('2')
+  await page.locator('[name="childCount"]').fill('4')
 
   await page.setInputFiles('[name="imageFiles"]', [
     path.join(__dirname, 'files', '1.jpg'),
@@ -60,8 +60,34 @@ test('should display hotels', async ({ page }) => {
     await expect(page.getByText('2 adults, 3 children')).toBeVisible()
     await expect(page.getByText('2 Star Rating')).toBeVisible()
 
-    await expect(page.getByRole('link', { name: 'View Details' })).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'View Details' }).first()
+    ).toBeVisible()
     await expect(page.getByRole('link', { name: 'Add Hotel' })).toBeVisible()
+  } catch (error) {
+    console.log('Error:', error)
+  }
+})
+
+test('should edit hotel', async ({ page }) => {
+  try {
+    await page.goto(`${UI_URL}my-hotels`)
+
+    await page.getByRole('link', { name: 'View Details' }).first().click()
+
+    await page.waitForSelector('[name="name"]', { state: 'attached' })
+    await expect(page.locator('[name="name"]')).toHaveValue('Dublin Gateaways')
+    await page.locator('[name="name"]').fill('Dublin Gateaways UPDATED')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByText('Hotel Saved!')).toBeVisible()
+
+    await page.reload()
+
+    await expect(page.locator('[name="name"]')).toHaveValue(
+      'Dublin Gateaways UPDATED'
+    )
+    await page.locator('[name="name"]').fill('Dublin Gateaways')
+    await page.getByRole('button', { name: 'Save' }).click()
   } catch (error) {
     console.log('Error:', error)
   }
