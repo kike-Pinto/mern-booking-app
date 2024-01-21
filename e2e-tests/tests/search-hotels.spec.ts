@@ -31,3 +31,14 @@ test('Should show hotel search result', async ({ page }) => {
     console.log('error', error)
   }
 })
+
+test('should show hotel detail', async ({ page }) => {
+  await page.goto(UI_URL)
+
+  await page.getByPlaceholder('Where are you going?').fill('Dublin')
+  await page.getByRole('button', { name: 'Search' }).click()
+
+  await page.getByText('Dublin Getaways').click()
+  await expect(page).toHaveURL(/detail/)
+  await expect(page.getByRole('button', { name: 'Book now' })).toBeVisible()
+})
